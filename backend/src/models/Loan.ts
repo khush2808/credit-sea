@@ -8,13 +8,11 @@ const loanSchema = new Schema(
       ref: "Application",
       required: [true, "Application ID is required"],
       unique: true,
-      index: true,
     },
     approvalDate: {
       type: Date,
       default: Date.now,
       required: true,
-      index: true,
     },
     interestRate: {
       type: Number,
@@ -36,7 +34,6 @@ const loanSchema = new Schema(
     isPaid: {
       type: Boolean,
       default: false,
-      index: true,
     },
     emi: {
       type: Number,
@@ -47,12 +44,10 @@ const loanSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: [true, "User ID is required"],
-      index: true,
     },
     nextPaymentDate: {
       type: Date,
       required: true,
-      index: true,
     },
     totalAmount: {
       type: Number,

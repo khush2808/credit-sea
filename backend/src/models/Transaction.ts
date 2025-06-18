@@ -7,7 +7,6 @@ const transactionSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Loan",
       required: [true, "Loan ID is required"],
-      index: true,
     },
     monthYear: {
       type: String,
@@ -18,7 +17,6 @@ const transactionSchema = new Schema(
       type: Date,
       default: Date.now,
       required: true,
-      index: true,
     },
     amount: {
       type: Number,
@@ -36,7 +34,6 @@ const transactionSchema = new Schema(
       enum: ["PENDING", "COMPLETED", "FAILED"],
       default: "COMPLETED",
       required: true,
-      index: true,
     },
     paymentMethod: {
       type: String,
@@ -61,18 +58,17 @@ const transactionSchema = new Schema(
   }
 );
 
-
+// Indexes
 transactionSchema.index({ loanId: 1, date: -1 });
 transactionSchema.index({ monthYear: 1 });
 transactionSchema.index({ date: -1 });
 transactionSchema.index({ status: 1, date: -1 });
 transactionSchema.index({ transactionType: 1, date: -1 });
 
-
+// Compound indexes
 transactionSchema.index({ loanId: 1, monthYear: 1 });
 transactionSchema.index({ loanId: 1, status: 1 });
 transactionSchema.index({ loanId: 1, transactionType: 1 });
-
 
 transactionSchema.virtual("loan", {
   ref: "Loan",
@@ -80,7 +76,6 @@ transactionSchema.virtual("loan", {
   foreignField: "_id",
   justOne: true,
 });
-
 
 transactionSchema.methods.generateTransactionId = function () {
   const timestamp = Date.now().toString();
@@ -109,7 +104,6 @@ transactionSchema.methods.isPenalty = function () {
 transactionSchema.methods.isPrepayment = function () {
   return this.transactionType === "PREPAYMENT";
 };
-
 
 transactionSchema.statics.findByLoan = function (loanId: string) {
   return this.find({ loanId }).sort({ date: -1 });
@@ -220,14 +214,13 @@ transactionSchema.statics.getMonthlyStats = async function (year?: number) {
   return stats;
 };
 
-
 transactionSchema.pre("save", function (next) {
-  
   if (this.isNew && !this.transactionId) {
-    this.transactionId = `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    this.transactionId = `TXN-${Date.now()}-${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
   }
 
-  
   if (!this.monthYear) {
     const date = this.date || new Date();
     this.monthYear = `${date.getFullYear()}-${String(

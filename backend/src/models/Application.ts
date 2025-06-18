@@ -7,14 +7,12 @@ const applicationSchema = new Schema<IApplication>(
       type: String,
       ref: "User",
       required: [true, "User ID is required"],
-      index: true,
     },
     status: {
       type: String,
       enum: Object.values(ApplicationStatus),
       default: ApplicationStatus.PENDING,
       required: true,
-      index: true,
     },
     amount: {
       type: Number,
@@ -53,12 +51,10 @@ const applicationSchema = new Schema<IApplication>(
     verifierId: {
       type: String,
       ref: "User",
-      index: true,
     },
     adminId: {
       type: String,
       ref: "User",
-      index: true,
     },
     verificationNotes: {
       type: String,
