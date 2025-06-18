@@ -34,6 +34,7 @@ export interface IUser extends Document {
   createdAt: Date;
   updatedAt: Date;
   isActive: boolean;
+  toSafeObject(): Omit<IUser, "password">;
 }
 
 export interface IApplication extends Document {
@@ -51,6 +52,9 @@ export interface IApplication extends Document {
   adminId?: string;
   verificationNotes?: string;
   rejectionReason?: string;
+  canBeVerified(): boolean;
+  canBeApproved(): boolean;
+  isProcessed(): boolean;
 }
 
 export interface ILoan extends Document {
@@ -65,6 +69,10 @@ export interface ILoan extends Document {
   userId: string;
   nextPaymentDate: Date;
   totalAmount: number;
+  calculateEMI(principal: number, rate: number, tenure: number): number;
+  makePayment(amount: number): Promise<ILoan>;
+  isOverdue(): boolean;
+  getDaysOverdue(): number;
 }
 
 export interface ITransaction extends Document {
@@ -92,6 +100,7 @@ export interface IStats extends Document {
   pendingApplications: number;
   approvedApplications: number;
   rejectedApplications: number;
+  updateStats(): Promise<IStats>;
 }
 
 // Request types - simplified
@@ -211,6 +220,20 @@ export interface ILoanMethods {
   getDaysOverdue(): number;
 }
 
+export interface IApplicationMethods {
+  canBeVerified(): boolean;
+  canBeApproved(): boolean;
+  isProcessed(): boolean;
+}
+
+export interface IStatsMethods {
+  updateStats(): Promise<IStats>;
+}
+
 // Document types
 export interface IUserDocument extends IUser, IUserMethods {}
 export interface ILoanDocument extends ILoan, ILoanMethods {}
+export interface IApplicationDocument
+  extends IApplication,
+    IApplicationMethods {}
+export interface IStatsDocument extends IStats, IStatsMethods {}

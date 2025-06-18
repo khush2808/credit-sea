@@ -198,7 +198,50 @@ loanSchema.statics.findUpcomingPayments = function (days: number = 7) {
   }).sort({ nextPaymentDate: 1 });
 };
 
+// Get loan statistics
+loanSchema.statics.getLoanStats = async function () {
+  const stats = await this.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalLoans: { $sum: 1 },
+        totalDisbursed: { $sum: "$totalAmount" },
+        totalOutstanding: { $sum: "$principalLeft" },
+        totalRepaid: {
+          $sum: { $subtract: ["$totalAmount", "$principalLeft"] },
+        },
+        activeLoans: {
+          $sum: {
+            $cond: [{ $eq: ["$isPaid", false] }, 1, 0],
+          },
+        },
+        completedLoans: {
+          $sum: {
+            $cond: [{ $eq: ["$isPaid", true] }, 1, 0],
+          },
+        },
+      },
+    },
+  ]);
+
+  return (
+    stats[0] || {
+      totalLoans: 0,
+      totalDisbursed: 0,
+      totalOutstanding: 0,
+      totalRepaid: 0,
+      activeLoans: 0,
+      completedLoans: 0,
+    }
+  );
+};
+
 // TODO: Add method to calculate penalty for overdue payments
 // TODO: Add method to generate payment schedule
 
-export const Loan = mongoose.model<ILoan>("Loan", loanSchema);
+// Add static method declarations to fix TypeScript
+interface LoanModel extends mongoose.Model<ILoan> {
+  getLoanStats(): Promise<any>;
+}
+
+export const Loan = mongoose.model<ILoan, LoanModel>("Loan", loanSchema);

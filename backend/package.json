@@ -5,16 +5,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc",
-    "test": "jest",
-    "test:simple": "node test/simple-test.js",
-    "test:comprehensive": "node test/comprehensive-flow-test.js",
-    "test:seed": "node seeders/database-seeder.js",
-    "test:all": "node test/run-all-tests.js",
-    "test:core": "node test/simple-comprehensive-test.js",
-    "test:existing": "node test/comprehensive-existing-data-test.js",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix"
+    "build": "tsc"
   },
   "keywords": [
     "loan",
