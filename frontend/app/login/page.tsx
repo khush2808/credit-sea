@@ -140,8 +140,11 @@ export default function LoginPage() {
           <CardContent className="pt-6">
             <h3 className="text-sm font-medium text-blue-900 mb-2">Demo Credentials</h3>
             <div className="text-xs text-blue-700 space-y-1">
-              <p><strong>Super Admin:</strong> admin@loanmanagement.com / SuperAdmin123!</p>
-              <p><strong>Customer:</strong> Create new account via signup</p>
+              <p><strong>Super Admin:</strong> super@loan.com / Password@1</p>
+              <p><strong>Admin:</strong> admin@loan.com / Password@1</p>
+              <p><strong>Verifier:</strong> verifier@loan.com / Password@1</p>
+              <p><strong>Customer:</strong> khush@loan.com / Password@1</p>
+              <p><strong>Customer:</strong> customer@loan.com / Password@1</p>
             </div>
           </CardContent>
         </Card>
