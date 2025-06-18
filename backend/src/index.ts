@@ -36,7 +36,7 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV === "production"
-        ? ["http://localhost:3000",'*'] // should be actual domain
+        ? ["http://localhost:3000",'https://credit-sea-rho.vercel.app/'] // should be actual domain
         : true,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
