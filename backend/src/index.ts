@@ -31,13 +31,10 @@ app.use(
   })
 );
 
-// CORS - TODO: fix this for production
+// CORS configuration - Fixed for production
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? ["http://localhost:3000",'https://credit-sea-rho.vercel.app/'] // should be actual domain
-        : true,
+    origin: ["http://localhost:3000", "https://credit-sea-rho.vercel.app"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
