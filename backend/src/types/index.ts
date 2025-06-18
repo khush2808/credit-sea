@@ -1,6 +1,6 @@
 import { Document } from "mongoose";
 
-// Enums
+
 export enum UserRole {
   USER = "USER",
   VERIFIER = "VERIFIER",
@@ -23,7 +23,7 @@ export enum EmploymentStatus {
   RETIRED = "RETIRED",
 }
 
-// Base Interfaces
+
 export interface IUser extends Document {
   _id: string;
   name: string;
@@ -94,7 +94,7 @@ export interface IStats extends Document {
   rejectedApplications: number;
 }
 
-// Request/Response Interfaces
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -143,7 +143,7 @@ export interface PayEMIRequest {
   paymentMethod?: string;
 }
 
-// JWT Payload
+
 export interface JWTPayload {
   userId: string;
   email: string;
@@ -152,7 +152,7 @@ export interface JWTPayload {
   exp?: number;
 }
 
-// API Response Types
+
 export interface ApiResponse<T = any> {
   success: boolean;
   message: string;
@@ -169,7 +169,7 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-// Query Interfaces
+
 export interface PaginationQuery {
   page?: number;
   limit?: number;
@@ -199,7 +199,7 @@ export interface UserQuery extends PaginationQuery {
   search?: string;
 }
 
-// Extended interfaces with custom methods
+
 export interface IUserMethods {
   toSafeObject(): Omit<IUser, 'password'>;
   hasPermission(requiredRole: UserRole): boolean;
@@ -222,7 +222,7 @@ export interface IStatsMethods {
   updateStats(): Promise<IStats>;
 }
 
-// Extended Document interfaces
+
 export interface IUserDocument extends IUser, IUserMethods {}
 export interface IApplicationDocument extends IApplication, IApplicationMethods {}
 export interface ILoanDocument extends ILoan, ILoanMethods {}

@@ -82,7 +82,7 @@ const applicationSchema = new Schema(
   }
 );
 
-// Indexes for better query performance
+
 applicationSchema.index({ userId: 1, status: 1 });
 applicationSchema.index({ verifierId: 1, status: 1 });
 applicationSchema.index({ adminId: 1, status: 1 });
@@ -91,13 +91,13 @@ applicationSchema.index({ updatedOn: -1 });
 applicationSchema.index({ amount: 1 });
 applicationSchema.index({ empStatus: 1 });
 
-// Compound indexes for common queries
+
 applicationSchema.index({ status: 1, dateTime: -1 });
 applicationSchema.index({ userId: 1, dateTime: -1 });
 applicationSchema.index({ verifierId: 1, dateTime: -1 });
 applicationSchema.index({ adminId: 1, dateTime: -1 });
 
-// Virtual for populated references
+
 applicationSchema.virtual("user", {
   ref: "User",
   localField: "userId",
@@ -126,7 +126,7 @@ applicationSchema.virtual("loan", {
   justOne: true,
 });
 
-// Instance methods
+
 applicationSchema.methods.canBeVerified = function () {
   return this.status === ApplicationStatus.PENDING;
 };
@@ -141,7 +141,7 @@ applicationSchema.methods.isProcessed = function () {
   );
 };
 
-// Static methods
+
 applicationSchema.statics.findByUser = function (userId: string) {
   return this.find({ userId }).sort({ dateTime: -1 });
 };
@@ -188,7 +188,7 @@ applicationSchema.statics.getApplicationStats = async function () {
   }, {});
 };
 
-// Pre-save middleware
+
 applicationSchema.pre("save", function (next) {
   if (this.isModified() && !this.isNew) {
     this.updatedOn = new Date();
@@ -196,7 +196,7 @@ applicationSchema.pre("save", function (next) {
   next();
 });
 
-// Pre-update middleware
+
 applicationSchema.pre(
   ["findOneAndUpdate", "updateOne", "updateMany"],
   function () {
