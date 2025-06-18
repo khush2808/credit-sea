@@ -319,17 +319,25 @@ export default function DashboardPage() {
         {}
         {isCustomer && (
           <>
-            {}
+            {/* Active Loan Section */}
             {activeLoan && (
               <Card className="bg-gradient-to-r from-green-600 to-green-700 text-white">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>Active Loan</span>
-                    <Link href="/loans/payment">
-                      <Button variant="outline" className="text-green-700 bg-white hover:bg-gray-100">
-                        Make Payment
-                      </Button>
-                    </Link>
+                    <div className="flex space-x-2">
+                      <Link href={`/loans/payment?loanId=${activeLoan._id}`}>
+                        <Button variant="outline" className="text-green-700 bg-white hover:bg-gray-100">
+                          <DollarSign className="w-4 h-4 mr-1" />
+                          Pay EMI
+                        </Button>
+                      </Link>
+                      <Link href={`/loans/${activeLoan._id}`}>
+                        <Button variant="outline" className="text-green-700 bg-white hover:bg-gray-100">
+                          View Details
+                        </Button>
+                      </Link>
+                    </div>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -344,17 +352,43 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <p className="text-green-100 text-sm">Next Payment</p>
-                      <p className="text-2xl font-bold">{new Date(activeLoan.nextPaymentDate).toLocaleDateString()}</p>
+                      <p className="text-xl font-bold">
+                        {new Date(activeLoan.nextPaymentDate).toLocaleDateString()}
+                      </p>
+                      {new Date() > new Date(activeLoan.nextPaymentDate) && (
+                        <p className="text-red-200 text-sm mt-1">
+                          <AlertCircle className="inline w-4 h-4 mr-1" />
+                          Payment Overdue
+                        </p>
+                      )}
                     </div>
                   </div>
-                  {activeLoan.isOverdue && (
-                    <div className="mt-4 p-3 bg-red-500/20 border border-red-300 rounded-lg">
-                      <p className="text-sm">
-                        <AlertCircle className="inline w-4 h-4 mr-1" />
-                        Payment overdue by {activeLoan.daysOverdue} days
-                      </p>
+                  <div className="mt-4 pt-4 border-t border-green-500/30">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <p className="text-green-100">Interest Rate: {activeLoan.interestRate}%</p>
+                      </div>
+                      <div>
+                        <p className="text-green-100">Tenure: {activeLoan.tenureMonths} months</p>
+                      </div>
                     </div>
-                  )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* No Active Loan - Show Quick Actions */}
+            {!activeLoan && (
+              <Card className="bg-gradient-to-r from-gray-100 to-gray-200">
+                <CardContent className="text-center py-8">
+                  <CreditCard className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">No Active Loans</h3>
+                  <p className="text-gray-600 mb-4">Ready to apply for a loan?</p>
+                  <Link href="/applications">
+                    <Button className="bg-green-600 hover:bg-green-700">
+                      Apply for Loan
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             )}
