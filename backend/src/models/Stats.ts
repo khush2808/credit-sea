@@ -70,10 +70,10 @@ const statsSchema = new Schema<IStats>(
   }
 );
 
-// Indexes
+
 statsSchema.index({ updatedOn: -1 });
 
-// Virtual fields for calculated values
+
 statsSchema.virtual("approvalRate").get(function () {
   if (this.totalApplications === 0) return 0;
   return Math.round((this.approvedApplications / this.totalApplications) * 100);
@@ -94,20 +94,20 @@ statsSchema.virtual("averageLoanAmount").get(function () {
   return Math.round(this.cashDisbursed / this.borrowers);
 });
 
-// Instance methods
+
 statsSchema.methods.updateStats = async function () {
   const User = mongoose.model("User");
   const Application = mongoose.model("Application");
   const Loan = mongoose.model("Loan");
   const Transaction = mongoose.model("Transaction");
 
-  // Count live users (active users)
+  
   const liveUsers = await User.countDocuments({ isActive: true });
 
-  // Count borrowers (users with approved applications)
+  
   const borrowers = await Loan.distinct("userId").then((ids) => ids.length);
 
-  // Get application statistics
+  
   const applicationStats = await Application.aggregate([
     {
       $group: {
@@ -122,7 +122,7 @@ statsSchema.methods.updateStats = async function () {
     return acc;
   }, {} as any);
 
-  // Get loan statistics
+  
   const loanStats = await Loan.aggregate([
     {
       $group: {
@@ -146,7 +146,7 @@ statsSchema.methods.updateStats = async function () {
     repaidLoans: 0,
   };
 
-  // Update all fields
+  
   this.liveUsers = liveUsers;
   this.borrowers = borrowers;
   this.cashDisbursed = loanData.totalDisbursed;
@@ -165,7 +165,7 @@ statsSchema.methods.updateStats = async function () {
   return this.save();
 };
 
-// Static methods
+
 statsSchema.statics.getLatestStats = function () {
   return this.findOne().sort({ updatedOn: -1 });
 };
@@ -239,7 +239,7 @@ statsSchema.statics.generateDashboardStats = async function () {
           $match: {
             status: "COMPLETED",
             date: {
-              $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+              $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), 
             },
           },
         },
@@ -269,7 +269,7 @@ statsSchema.statics.generateDashboardStats = async function () {
   };
 };
 
-// Pre-save middleware
+
 statsSchema.pre("save", function (next) {
   this.updatedOn = new Date();
   next();

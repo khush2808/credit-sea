@@ -43,9 +43,9 @@ const loanSchema = new Schema(
       required: [true, "EMI amount is required"],
       min: [1, "EMI must be at least 1"],
     },
-    //some ts error here
-    //cursor fix this
-    // don't ts ignore ,understand the errors in this file and fix them.
+    
+    
+    
 
     userId: {
       type: Schema.Types.ObjectId,
@@ -75,17 +75,17 @@ const loanSchema = new Schema(
   }
 );
 
-// Indexes for better query performance
+
 loanSchema.index({ userId: 1, isPaid: 1 });
 loanSchema.index({ approvalDate: -1 });
 loanSchema.index({ nextPaymentDate: 1 });
 loanSchema.index({ isPaid: 1, nextPaymentDate: 1 });
 
-// Compound indexes for common queries
+
 loanSchema.index({ userId: 1, approvalDate: -1 });
 loanSchema.index({ isPaid: 1, approvalDate: -1 });
 
-// Virtual for populated references
+
 loanSchema.virtual("application", {
   ref: "Application",
   localField: "applicationId",
@@ -106,7 +106,7 @@ loanSchema.virtual("transactions", {
   foreignField: "loanId",
 });
 
-// Virtual fields for calculations
+
 loanSchema.virtual("totalPaid").get(function () {
   return this.totalAmount - this.principalLeft;
 });
@@ -125,7 +125,7 @@ loanSchema.virtual("completionPercentage").get(function () {
   );
 });
 
-// Instance methods
+
 loanSchema.methods.calculateEMI = function (
   principal: number,
   rate: number,
@@ -135,7 +135,7 @@ loanSchema.methods.calculateEMI = function (
   const emi =
     (principal * monthlyRate * Math.pow(1 + monthlyRate, tenure)) /
     (Math.pow(1 + monthlyRate, tenure) - 1);
-  return Math.round(emi * 100) / 100; // Round to 2 decimal places
+  return Math.round(emi * 100) / 100; 
 };
 
 loanSchema.methods.makePayment = function (amount: number) {
@@ -148,7 +148,7 @@ loanSchema.methods.makePayment = function (amount: number) {
   if (this.principalLeft === 0) {
     this.isPaid = true;
   } else {
-    // Update next payment date (add 1 month)
+    
     const nextDate = new Date(this.nextPaymentDate);
     nextDate.setMonth(nextDate.getMonth() + 1);
     this.nextPaymentDate = nextDate;
@@ -169,7 +169,7 @@ loanSchema.methods.getDaysOverdue = function (): number {
   return Math.floor(timeDiff / (1000 * 3600 * 24));
 };
 
-// Static methods
+
 loanSchema.statics.findByUser = function (userId: string) {
   return this.find({ userId }).sort({ approvalDate: -1 });
 };
@@ -235,9 +235,9 @@ loanSchema.statics.getLoanStats = async function () {
   );
 };
 
-// Pre-save middleware
+
 loanSchema.pre("save", function (next) {
-  // Set next payment date if it's a new loan
+  
   if (this.isNew && !this.nextPaymentDate) {
     const nextDate = new Date(this.approvalDate);
     nextDate.setMonth(nextDate.getMonth() + 1);

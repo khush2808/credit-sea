@@ -16,14 +16,12 @@ import {
 import { UserRole } from "../types";
 import { logger } from "../utils/logger";
 
-/**
- * Sign up new customer (USER role only)
- */
+
 export const signup = async (req: Request, res: Response) => {
   try {
     const { name, email, phone, password } = req.body;
 
-    // Check if user already exists
+    
     const existingUser = await User.findOne({
       $or: [{ email }, { phone }],
     });
@@ -35,27 +33,27 @@ export const signup = async (req: Request, res: Response) => {
       return sendConflict(res, "Phone number already registered");
     }
 
-    // Validate password strength
+    
     const passwordValidation = validatePasswordStrength(password);
     if (!passwordValidation.isValid) {
       return sendError(res, passwordValidation.message!, 400);
     }
 
-    // Hash password
+    
     const hashedPassword = await hashPassword(password);
 
-    // Create user with USER role only
+    
     const user = new User({
       name,
       email,
       phone,
       password: hashedPassword,
-      role: UserRole.USER, // Signup only creates customers
+      role: UserRole.USER, 
     });
 
     await user.save();
 
-    // Generate token
+    
     const token = generateToken({
       userId: user._id,
       email: user.email,
@@ -79,31 +77,29 @@ export const signup = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Login user
- */
+
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    // Find user by email
+    
     const user = await User.findOne({ email }).select("+password");
     if (!user) {
       return sendUnauthorized(res, "Invalid email or password");
     }
 
-    // Check if user is active
+    
     if (!user.isActive) {
       return sendUnauthorized(res, "Account has been deactivated");
     }
 
-    // Compare password
+    
     const isValidPassword = await comparePassword(password, user.password);
     if (!isValidPassword) {
       return sendUnauthorized(res, "Invalid email or password");
     }
 
-    // Generate token
+    
     const token = generateToken({
       userId: user._id,
       email: user.email,
@@ -126,9 +122,7 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Get current user profile
- */
+
 export const getProfile = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.userId;
@@ -149,9 +143,7 @@ export const getProfile = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Update user profile
- */
+
 export const updateProfile = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.userId;
@@ -162,7 +154,7 @@ export const updateProfile = async (req: Request, res: Response) => {
       return sendNotFound(res, "User not found");
     }
 
-    // Check if phone number is already taken by another user
+    
     if (phone && phone !== user.phone) {
       const existingUser = await User.findOne({
         phone,
@@ -173,7 +165,7 @@ export const updateProfile = async (req: Request, res: Response) => {
       }
     }
 
-    // Update fields
+    
     if (name) user.name = name;
     if (phone) user.phone = phone;
 
@@ -192,9 +184,7 @@ export const updateProfile = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Change password
- */
+
 export const changePassword = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.userId;
@@ -205,7 +195,7 @@ export const changePassword = async (req: Request, res: Response) => {
       return sendNotFound(res, "User not found");
     }
 
-    // Verify current password
+    
     const isValidPassword = await comparePassword(
       currentPassword,
       user.password
@@ -214,13 +204,13 @@ export const changePassword = async (req: Request, res: Response) => {
       return sendUnauthorized(res, "Current password is incorrect");
     }
 
-    // Validate new password strength
+    
     const passwordValidation = validatePasswordStrength(newPassword);
     if (!passwordValidation.isValid) {
       return sendError(res, passwordValidation.message!, 400);
     }
 
-    // Hash new password
+    
     const hashedPassword = await hashPassword(newPassword);
     user.password = hashedPassword;
     await user.save();
@@ -234,14 +224,12 @@ export const changePassword = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Create user (Admin/Super Admin only)
- */
+
 export const createUser = async (req: Request, res: Response) => {
   try {
     const { name, email, phone, password, role } = req.body;
 
-    // Check if user already exists
+    
     const existingUser = await User.findOne({
       $or: [{ email }, { phone }],
     });
@@ -253,16 +241,16 @@ export const createUser = async (req: Request, res: Response) => {
       return sendConflict(res, "Phone number already registered");
     }
 
-    // Validate password strength
+    
     const passwordValidation = validatePasswordStrength(password);
     if (!passwordValidation.isValid) {
       return sendError(res, passwordValidation.message!, 400);
     }
 
-    // Hash password
+    
     const hashedPassword = await hashPassword(password);
 
-    // Create user
+    
     const user = new User({
       name,
       email,
@@ -287,9 +275,7 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Deactivate user (Admin/Super Admin only)
- */
+
 export const deactivateUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -299,7 +285,7 @@ export const deactivateUser = async (req: Request, res: Response) => {
       return sendNotFound(res, "User not found");
     }
 
-    // Prevent deactivating super admin
+    
     if (user.role === UserRole.SUPER_ADMIN) {
       return sendError(res, "Cannot deactivate super admin", 403);
     }
@@ -320,9 +306,7 @@ export const deactivateUser = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Reactivate user (Admin/Super Admin only)
- */
+
 export const reactivateUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;

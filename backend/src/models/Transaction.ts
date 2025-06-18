@@ -61,19 +61,19 @@ const transactionSchema = new Schema(
   }
 );
 
-// Indexes for better query performance
+
 transactionSchema.index({ loanId: 1, date: -1 });
 transactionSchema.index({ monthYear: 1 });
 transactionSchema.index({ date: -1 });
 transactionSchema.index({ status: 1, date: -1 });
 transactionSchema.index({ transactionType: 1, date: -1 });
 
-// Compound indexes for common queries
+
 transactionSchema.index({ loanId: 1, monthYear: 1 });
 transactionSchema.index({ loanId: 1, status: 1 });
 transactionSchema.index({ loanId: 1, transactionType: 1 });
 
-// Virtual for populated references
+
 transactionSchema.virtual("loan", {
   ref: "Loan",
   localField: "loanId",
@@ -81,7 +81,7 @@ transactionSchema.virtual("loan", {
   justOne: true,
 });
 
-// Instance methods
+
 transactionSchema.methods.generateTransactionId = function () {
   const timestamp = Date.now().toString();
   const random = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -110,7 +110,7 @@ transactionSchema.methods.isPrepayment = function () {
   return this.transactionType === "PREPAYMENT";
 };
 
-// Static methods
+
 transactionSchema.statics.findByLoan = function (loanId: string) {
   return this.find({ loanId }).sort({ date: -1 });
 };
@@ -220,14 +220,14 @@ transactionSchema.statics.getMonthlyStats = async function (year?: number) {
   return stats;
 };
 
-// Pre-save middleware
+
 transactionSchema.pre("save", function (next) {
-  // Generate transaction ID if not provided
+  
   if (this.isNew && !this.transactionId) {
     this.transactionId = `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  // Set monthYear if not provided
+  
   if (!this.monthYear) {
     const date = this.date || new Date();
     this.monthYear = `${date.getFullYear()}-${String(
