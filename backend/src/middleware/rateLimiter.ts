@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 
 
 const noOpMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  next();
+next();
 };
 
 
