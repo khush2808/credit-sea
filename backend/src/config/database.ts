@@ -3,20 +3,44 @@ import { logger } from "../utils/logger";
 
 const connectDB = async (): Promise<void> => {
   try {
-    const mongoURI =
-      process.env.MONGODB_URI || "mongodb://localhost:27017/loan-management";
+    // For production, you MUST set MONGODB_URI environment variable
+    // For local development, it defaults to local MongoDB
+    const mongoURI = process.env.MONGODB_URI;
+
+    if (!mongoURI) {
+      if (process.env.NODE_ENV === "production") {
+        logger.error(
+          "MONGODB_URI environment variable is required in production"
+        );
+        throw new Error(
+          "MONGODB_URI environment variable is required in production"
+        );
+      }
+      // Only use localhost for development
+      logger.warn(
+        "Using local MongoDB for development. Set MONGODB_URI for production."
+      );
+    }
+
+    const finalURI = mongoURI || "mongodb://localhost:27017/loan-management";
 
     const options = {
-      autoIndex: true,
-      serverSelectionTimeoutMS: 5000,
+      autoIndex: process.env.NODE_ENV !== "production", // Disable autoIndex in production for performance
+      serverSelectionTimeoutMS: 10000, // Increased timeout for cloud connections
       socketTimeoutMS: 45000,
+      maxPoolSize: 10,
+      retryWrites: true,
     };
 
-    await mongoose.connect(mongoURI, options);
+    await mongoose.connect(finalURI, options);
 
-    logger.info("MongoDB connected successfully");
+    logger.info(
+      `MongoDB connected successfully to: ${
+        mongoURI ? "Cloud Database" : "Local Database"
+      }`
+    );
 
-    
+    // Connection event listeners
     mongoose.connection.on("error", (error) => {
       logger.error("MongoDB connection error:", error);
     });
@@ -25,7 +49,11 @@ const connectDB = async (): Promise<void> => {
       logger.warn("MongoDB disconnected");
     });
 
-    
+    mongoose.connection.on("reconnected", () => {
+      logger.info("MongoDB reconnected");
+    });
+
+    // Graceful shutdown
     process.on("SIGINT", async () => {
       await mongoose.connection.close();
       logger.info("MongoDB connection closed through app termination");

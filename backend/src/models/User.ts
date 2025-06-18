@@ -63,24 +63,19 @@ const userSchema = new Schema<IUser>(
   }
 );
 
-
-userSchema.index({ email: 1 });
 userSchema.index({ phone: 1 });
 userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 userSchema.index({ createdAt: -1 });
 
-
 userSchema.index({ role: 1, isActive: 1 });
 userSchema.index({ email: 1, isActive: 1 });
-
 
 userSchema.methods.toSafeObject = function () {
   const user = this.toObject();
   delete user.password;
   return user;
 };
-
 
 userSchema.statics.findByEmail = function (email: string) {
   return this.findOne({ email: email.toLowerCase() });
@@ -118,15 +113,12 @@ userSchema.statics.searchUsers = function (
   return this.find(query);
 };
 
-
 userSchema.pre("save", function (next) {
-  
   if (this.isModified("email")) {
     this.email = this.email.toLowerCase();
   }
   next();
 });
-
 
 userSchema.pre(["findOneAndUpdate", "updateOne", "updateMany"], function () {
   const update = this.getUpdate() as any;
