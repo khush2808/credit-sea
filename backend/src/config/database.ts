@@ -24,15 +24,8 @@ const connectDB = async (): Promise<void> => {
 
     const finalURI = mongoURI || "mongodb://localhost:27017/loan-management";
 
-    const options = {
-      autoIndex: process.env.NODE_ENV !== "production", // Disable autoIndex in production for performance
-      serverSelectionTimeoutMS: 10000, // Increased timeout for cloud connections
-      socketTimeoutMS: 45000,
-      maxPoolSize: 10,
-      retryWrites: true,
-    };
 
-    await mongoose.connect(finalURI, options);
+    await mongoose.connect(finalURI);
 
     logger.info(
       `MongoDB connected successfully to: ${
