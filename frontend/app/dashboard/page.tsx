@@ -47,7 +47,7 @@ export default function DashboardPage() {
       setLoading(true)
       
       if (isAdmin) {
-        
+        // Admin dashboard
         const [dashboardRes, applicationsRes, loansRes] = await Promise.all([
           statsAPI.getDashboard(),
           applicationAPI.getAll({ page: 1, limit: 5, sortBy: 'dateTime', sortOrder: 'desc' }),
@@ -55,17 +55,39 @@ export default function DashboardPage() {
         ])
         
         setStats(dashboardRes.data.data)
-        setRecentApplications(applicationsRes.data.data)
-        setRecentLoans(loansRes.data.data)
-      } else if (isCustomer) {
         
+        // Extract applications from correct response structure
+        const applicationsArray = applicationsRes.data?.data?.data || []
+        setRecentApplications(applicationsArray)
+        
+        // Extract loans from correct response structure
+        const loansArray = loansRes.data?.data?.data || []
+        setRecentLoans(loansArray)
+        
+        console.log('✅ Admin dashboard loaded:', {
+          stats: dashboardRes.data.data,
+          applications: applicationsArray.length,
+          loans: loansArray.length
+        })
+      } else if (isCustomer) {
+        // Customer dashboard
         const [applicationsRes, activeLoanRes] = await Promise.all([
           applicationAPI.getAll({ page: 1, limit: 5 }),
           loanAPI.getActive().catch(() => ({ data: { data: null } }))
         ])
         
-        setRecentApplications(applicationsRes.data.data)
-        setActiveLoan(activeLoanRes.data.data)
+        // Extract applications from correct response structure
+        const applicationsArray = applicationsRes.data?.data?.data || []
+        setRecentApplications(applicationsArray)
+        
+        // Extract active loan (if any)
+        const activeLoanData = activeLoanRes.data?.data || null
+        setActiveLoan(activeLoanData)
+        
+        console.log('✅ Customer dashboard loaded:', {
+          applications: applicationsArray.length,
+          activeLoan: !!activeLoanData
+        })
       }
     } catch (error: any) {
       console.error('Failed to load dashboard data:', error)

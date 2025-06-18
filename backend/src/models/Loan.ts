@@ -43,10 +43,6 @@ const loanSchema = new Schema(
       required: [true, "EMI amount is required"],
       min: [1, "EMI must be at least 1"],
     },
-    
-    
-    
-
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
@@ -75,17 +71,17 @@ const loanSchema = new Schema(
   }
 );
 
-
+// Indexes for better query performance
 loanSchema.index({ userId: 1, isPaid: 1 });
 loanSchema.index({ approvalDate: -1 });
 loanSchema.index({ nextPaymentDate: 1 });
 loanSchema.index({ isPaid: 1, nextPaymentDate: 1 });
 
-
+// Compound indexes
 loanSchema.index({ userId: 1, approvalDate: -1 });
 loanSchema.index({ isPaid: 1, approvalDate: -1 });
 
-
+// Virtual relationships
 loanSchema.virtual("application", {
   ref: "Application",
   localField: "applicationId",
@@ -106,10 +102,11 @@ loanSchema.virtual("transactions", {
   foreignField: "loanId",
 });
 
-
+// Virtual computed fields
 loanSchema.virtual("totalPaid").get(function () {
   return this.totalAmount - this.principalLeft;
 });
+
 loanSchema.virtual("remainingTenure").get(function () {
   const totalPaid = this.totalAmount - this.principalLeft;
   const remainingAmount = this.principalLeft;
@@ -125,7 +122,7 @@ loanSchema.virtual("completionPercentage").get(function () {
   );
 });
 
-
+// EMI calculation method
 loanSchema.methods.calculateEMI = function (
   principal: number,
   rate: number,
@@ -135,9 +132,10 @@ loanSchema.methods.calculateEMI = function (
   const emi =
     (principal * monthlyRate * Math.pow(1 + monthlyRate, tenure)) /
     (Math.pow(1 + monthlyRate, tenure) - 1);
-  return Math.round(emi * 100) / 100; 
+  return Math.round(emi * 100) / 100; // Round to 2 decimal places
 };
 
+// Payment processing
 loanSchema.methods.makePayment = function (amount: number) {
   if (amount <= 0) {
     throw new Error("Payment amount must be positive");
@@ -148,7 +146,7 @@ loanSchema.methods.makePayment = function (amount: number) {
   if (this.principalLeft === 0) {
     this.isPaid = true;
   } else {
-    
+    // Update next payment date
     const nextDate = new Date(this.nextPaymentDate);
     nextDate.setMonth(nextDate.getMonth() + 1);
     this.nextPaymentDate = nextDate;
@@ -157,10 +155,12 @@ loanSchema.methods.makePayment = function (amount: number) {
   return this.save();
 };
 
+// Check if loan is overdue
 loanSchema.methods.isOverdue = function (): boolean {
   return !this.isPaid && new Date() > this.nextPaymentDate;
 };
 
+// Get days overdue
 loanSchema.methods.getDaysOverdue = function (): number {
   if (!this.isOverdue()) return 0;
 
@@ -169,7 +169,7 @@ loanSchema.methods.getDaysOverdue = function (): number {
   return Math.floor(timeDiff / (1000 * 3600 * 24));
 };
 
-
+// Static methods for common queries
 loanSchema.statics.findByUser = function (userId: string) {
   return this.find({ userId }).sort({ approvalDate: -1 });
 };
@@ -198,52 +198,7 @@ loanSchema.statics.findUpcomingPayments = function (days: number = 7) {
   }).sort({ nextPaymentDate: 1 });
 };
 
-loanSchema.statics.getLoanStats = async function () {
-  const stats = await this.aggregate([
-    {
-      $group: {
-        _id: null,
-        totalLoans: { $sum: 1 },
-        totalDisbursed: { $sum: "$totalAmount" },
-        totalOutstanding: { $sum: "$principalLeft" },
-        totalRepaid: {
-          $sum: { $subtract: ["$totalAmount", "$principalLeft"] },
-        },
-        activeLoans: {
-          $sum: {
-            $cond: [{ $eq: ["$isPaid", false] }, 1, 0],
-          },
-        },
-        completedLoans: {
-          $sum: {
-            $cond: [{ $eq: ["$isPaid", true] }, 1, 0],
-          },
-        },
-      },
-    },
-  ]);
-
-  return (
-    stats[0] || {
-      totalLoans: 0,
-      totalDisbursed: 0,
-      totalOutstanding: 0,
-      totalRepaid: 0,
-      activeLoans: 0,
-      completedLoans: 0,
-    }
-  );
-};
-
-
-loanSchema.pre("save", function (next) {
-  
-  if (this.isNew && !this.nextPaymentDate) {
-    const nextDate = new Date(this.approvalDate);
-    nextDate.setMonth(nextDate.getMonth() + 1);
-    this.nextPaymentDate = nextDate;
-  }
-  next();
-});
+// TODO: Add method to calculate penalty for overdue payments
+// TODO: Add method to generate payment schedule
 
 export const Loan = mongoose.model<ILoan>("Loan", loanSchema);

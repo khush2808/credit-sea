@@ -1,6 +1,6 @@
 import { Document } from "mongoose";
 
-
+// User roles
 export enum UserRole {
   USER = "USER",
   VERIFIER = "VERIFIER",
@@ -23,7 +23,7 @@ export enum EmploymentStatus {
   RETIRED = "RETIRED",
 }
 
-
+// Main interfaces
 export interface IUser extends Document {
   _id: string;
   name: string;
@@ -94,7 +94,7 @@ export interface IStats extends Document {
   rejectedApplications: number;
 }
 
-
+// Request types - simplified
 export interface LoginRequest {
   email: string;
   password: string;
@@ -143,7 +143,7 @@ export interface PayEMIRequest {
   paymentMethod?: string;
 }
 
-
+// JWT payload
 export interface JWTPayload {
   userId: string;
   email: string;
@@ -152,7 +152,7 @@ export interface JWTPayload {
   exp?: number;
 }
 
-
+// API response format
 export interface ApiResponse<T = any> {
   success: boolean;
   message: string;
@@ -169,7 +169,7 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-
+// Query types - basic ones
 export interface PaginationQuery {
   page?: number;
   limit?: number;
@@ -199,16 +199,9 @@ export interface UserQuery extends PaginationQuery {
   search?: string;
 }
 
-
+// Method interfaces - keeping it simple
 export interface IUserMethods {
-  toSafeObject(): Omit<IUser, 'password'>;
-  hasPermission(requiredRole: UserRole): boolean;
-}
-
-export interface IApplicationMethods {
-  canBeVerified(): boolean;
-  canBeApproved(): boolean;
-  isProcessed(): boolean;
+  toSafeObject(): Omit<IUser, "password">;
 }
 
 export interface ILoanMethods {
@@ -218,12 +211,6 @@ export interface ILoanMethods {
   getDaysOverdue(): number;
 }
 
-export interface IStatsMethods {
-  updateStats(): Promise<IStats>;
-}
-
-
+// Document types
 export interface IUserDocument extends IUser, IUserMethods {}
-export interface IApplicationDocument extends IApplication, IApplicationMethods {}
 export interface ILoanDocument extends ILoan, ILoanMethods {}
-export interface IStatsDocument extends IStats, IStatsMethods {}

@@ -228,47 +228,26 @@ export const changePassword = async (req: Request, res: Response) => {
 export const createUser = async (req: Request, res: Response) => {
   try {
     const { name, email, phone, password, role } = req.body;
-
     
-    const existingUser = await User.findOne({
-      $or: [{ email }, { phone }],
-    });
+    // Basic validation
+    if (!name || !email || !phone || !password || !role) {
+      return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
 
+    // Check existing user
+    const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
     if (existingUser) {
-      if (existingUser.email === email) {
-        return sendConflict(res, "Email already registered");
-      }
-      return sendConflict(res, "Phone number already registered");
+      return res.status(409).json({ success: false, message: "User already exists" });
     }
 
-    
-    const passwordValidation = validatePasswordStrength(password);
-    if (!passwordValidation.isValid) {
-      return sendError(res, passwordValidation.message!, 400);
-    }
-
-    
     const hashedPassword = await hashPassword(password);
-
-    
-    const user = new User({
-      name,
-      email,
-      phone,
-      password: hashedPassword,
-      role,
-    });
-
+    const user = new User({ name, email, phone, password: hashedPassword, role });
     await user.save();
 
-    logger.info(`New user created by admin: ${email} with role ${role}`);
+    // Quick log
+    console.log(`Admin created user: ${email} with role: ${role}`);
 
-    return sendSuccess(
-      res,
-      user.toSafeObject(),
-      "User created successfully",
-      201
-    );
+    return sendSuccess(res, user.toSafeObject(), "User created successfully", 201);
   } catch (error) {
     logger.error("Create user error:", error);
     return sendError(res, "Failed to create user");
@@ -278,9 +257,9 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const deactivateUser = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
+    const { id } = req.params;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(id);
     if (!user) {
       return sendNotFound(res, "User not found");
     }
@@ -295,11 +274,7 @@ export const deactivateUser = async (req: Request, res: Response) => {
 
     logger.info(`User deactivated: ${user.email}`);
 
-    return sendSuccess(
-      res,
-      user.toSafeObject(),
-      "User deactivated successfully"
-    );
+    return sendSuccess(res, user.toSafeObject(), "User deactivated successfully");
   } catch (error) {
     logger.error("Deactivate user error:", error);
     return sendError(res, "Failed to deactivate user");
@@ -309,9 +284,9 @@ export const deactivateUser = async (req: Request, res: Response) => {
 
 export const reactivateUser = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
+    const { id } = req.params;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(id);
     if (!user) {
       return sendNotFound(res, "User not found");
     }
@@ -321,11 +296,7 @@ export const reactivateUser = async (req: Request, res: Response) => {
 
     logger.info(`User reactivated: ${user.email}`);
 
-    return sendSuccess(
-      res,
-      user.toSafeObject(),
-      "User reactivated successfully"
-    );
+    return sendSuccess(res, user.toSafeObject(), "User reactivated successfully");
   } catch (error) {
     logger.error("Reactivate user error:", error);
     return sendError(res, "Failed to reactivate user");

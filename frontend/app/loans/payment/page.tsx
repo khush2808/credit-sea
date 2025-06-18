@@ -60,16 +60,22 @@ function PaymentPageContent() {
     try {
       setLoading(true)
       const response = await loanAPI.getAll({ isPaid: false })
-      setLoans(response.data.data)
       
-      if (!loanId && response.data.data.length > 0) {
-        const firstLoan = response.data.data[0]
+      // Get loans array from correct response structure
+      const loansArray = response.data?.data?.data || []
+      console.log('✅ Active loans loaded for payment:', loansArray.length, 'items')
+      
+      setLoans(loansArray)
+      
+      if (!loanId && loansArray.length > 0) {
+        const firstLoan = loansArray[0]
         setSelectedLoan(firstLoan)
         setPaymentData(prev => ({ ...prev, amount: firstLoan.emi.toString() }))
       }
     } catch (error: any) {
       console.error('Failed to load loans:', error)
       toast.error('Failed to load loans')
+      setLoans([])
     } finally {
       setLoading(false)
     }

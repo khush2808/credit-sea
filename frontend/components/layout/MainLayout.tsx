@@ -45,6 +45,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const { user, logout, isAdmin, isVerifier, isCustomer } = useAuth()
   const [sidebarOpen, setSidebarOpen] = React.useState(false)
 
+  // Debug log - TODO: remove this
+  // console.log('MainLayout rendered for user:', user?.email)
+
   const filteredNavigation = navigation.filter(item => {
     if (item.adminOnly && !isAdmin) return false
     if (item.verifierOnly && !isVerifier) return false
@@ -54,7 +57,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {}
+      {/* Desktop Sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4 shadow-sm">
           <div className="flex h-16 shrink-0 items-center">
@@ -88,7 +91,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 </ul>
               </li>
               
-              {}
+              {/* User Profile Section */}
               <li className="mt-auto">
                 <div className="flex items-center gap-x-4 px-2 py-3 text-sm font-semibold leading-6 text-gray-900">
                   <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
@@ -115,9 +118,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </div>
       </div>
 
-      {}
+      {/* Main Content Area */}
       <div className="lg:pl-72">
-        {}
+        {/* Top Navigation */}
         <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
           <Button
             variant="ghost"
@@ -128,26 +131,26 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <Menu className="h-6 w-6" />
           </Button>
 
-          {}
+          {/* Mobile Title */}
           <div className="flex-1 lg:hidden">
             <h1 className="text-xl font-semibold text-gray-900">CREDIT APP</h1>
           </div>
 
-          {}
+          {/* Right side of top nav */}
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6 justify-end">
             <div className="flex items-center gap-x-4 lg:gap-x-6">
-              {}
+              {/* Notifications - TODO: implement notifications */}
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-6 w-6" />
                 <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
               </Button>
 
-              {}
+              {/* Messages - placeholder */}
               <Button variant="ghost" size="icon">
                 <MessageCircle className="h-6 w-6" />
               </Button>
 
-              {}
+              {/* Separator */}
               <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200" />
               <div className="flex items-center gap-x-4">
                 <span className="hidden lg:flex lg:items-center">
@@ -165,7 +168,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </div>
         </div>
 
-        {}
+        {/* Page Content */}
         <main className="py-6">
           <div className="px-4 sm:px-6 lg:px-8">
             {children}
@@ -173,7 +176,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </main>
       </div>
 
-      {}
+      {/* Mobile Sidebar */}
       {sidebarOpen && (
         <div className="relative z-50 lg:hidden">
           <div className="fixed inset-0 bg-gray-900/80" onClick={() => setSidebarOpen(false)} />

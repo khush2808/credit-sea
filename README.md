@@ -1,79 +1,102 @@
-# Credit Sea – Loan-Management Platform
+# Credit Sea – Loan Management Platform
 
-Credit Sea is a full-stack web application that lets customers apply for loans, make EMI payments, and track their balances while verifiers and admins handle the approval workflow.  
-It is built with a modern TypeScript stack: **Express + MongoDB** in the backend and **Next.js 15** in the frontend.
+A full-stack loan management system where customers can apply for loans and admins can manage the approval process.
 
----
+Built with **Express + MongoDB** backend and **Next.js 15** frontend.
 
-## 📂 Monorepo layout
+## Project Structure
 
 ```
 credit-sea/
-├─ backend/     # Express + TypeScript API
-│  ├─ src/
-│  └─ …
-├─ frontend/    # Next.js 15 (App Router) client
-│  ├─ app/
-│  └─ …
-└─ README.md    # <–– you are here
+├─ backend/     # API server
+├─ frontend/    # Next.js app
+└─ README.md
 ```
 
-## 🔧 Tech stack
+## Tech Stack
 
-| Layer    | Main libraries / tools                                                                                |
-| -------- | ----------------------------------------------------------------------------------------------------- |
-| Backend  | Node.js 18, Express, TypeScript, MongoDB + Mongoose, Zod, bcrypt, JWT, Winston, rate-limiter-flexible |
-| Frontend | Next.js 15, React 18, TypeScript, Tailwind CSS, shadcn/ui, Axios (SWR ready), Chart.js (placeholder)  |
+**Backend:** Node.js, Express, TypeScript, MongoDB, JWT  
+**Frontend:** Next.js 15, React 19, TypeScript, Tailwind CSS, shadcn/ui
 
----
+## Features
 
-## 🚀 Quick start
+- User registration and authentication
+- Loan application system
+- Multi-step approval workflow (Verifier → Admin)
+- EMI payment tracking
+- Role-based access control
+- Admin dashboard with statistics
 
-1. **Clone & install**
+## Quick Setup
+
+1. **Clone and install**
+
    ```bash
    git clone <repo> credit-sea && cd credit-sea
-   # backend deps
-   cd backend && npm install && cd ..
-   # frontend deps
-   cd frontend && npm install && cd ..
+
+   # Backend
+   cd backend && npm install
+
+   # Frontend
+   cd ../frontend && npm install
    ```
-2. **Environment variables**  
-   Copy `backend/.env.example` → `backend/.env` and adjust MongoDB URI & JWT secret.
-3. **Run everything in dev mode**
+
+2. **Configure backend**
 
    ```bash
-   # terminal 1
+   cd backend
+   cp .env.example .env
+   # Edit .env with your MongoDB URI and JWT secret
+   ```
+
+3. **Run both servers**
+
+   ```bash
+   # Terminal 1 - Backend
    cd backend && npm run dev
 
-   # terminal 2
+   # Terminal 2 - Frontend
    cd frontend && npm run dev
    ```
 
-   Back-end defaults to http://localhost:8000, front-end to http://localhost:3000.
+Backend runs on http://localhost:8000  
+Frontend runs on http://localhost:3000
 
----
+## User Roles
 
-## ✨ Core features
+- **Customer** - Apply for loans, make payments
+- **Verifier** - Verify loan applications
+- **Admin** - Approve loans, manage users
+- **Super Admin** - Full system access
 
-- Customer sign-up / login
-- Create loan applications → multi-step **verify → approve** flow
-- Automatic loan & EMI schedule generation
-- Role hierarchy: **USER → VERIFIER → ADMIN → SUPER_ADMIN** (hard-coded seed)
-- Real-time stats endpoint for dashboards
+## Workflow
 
----
+1. Customer applies for loan
+2. Verifier reviews and verifies application
+3. Admin approves or rejects verified applications
+4. Approved applications become active loans
+5. Customer makes EMI payments
 
-## 📑 REST API – 30-second tour
+## API Overview
 
-(Full details live in [`backend/README.md`](backend/README.md))
+**Auth:** `/api/auth/*` - signup, login, profile  
+**Applications:** `/api/applications/*` - CRUD operations  
+**Loans:** `/api/loans/*` - loan management, payments  
+**Admin:** `/api/admin/*` - user management  
+**Stats:** `/api/stats/*` - dashboard data
 
-| Area         | Method & path                                   | Role     |
-| ------------ | ----------------------------------------------- | -------- |
-| Auth         | `POST /api/auth/signup`, `POST /api/auth/login` | anyone   |
-| Applications | `POST /api/applications`                        | USER     |
-|              | `PUT /api/applications/:id/verify`              | VERIFIER |
-|              | `PUT /api/applications/:id/approve`             | ADMIN    |
-| Loans        | `GET /api/loans`, `POST /api/loans/:id/payment` | USER     |
-| Stats        | `GET /api/stats/dashboard`                      | ADMIN    |
+## Default Admin
 
-JWT is expected in the `Authorization: Bearer <token>` header.
+Email: `admin@loanmanagement.com`  
+Password: `SuperAdmin123!`
+
+## Development Notes
+
+- Uses JWT for authentication
+- MongoDB with Mongoose ODM
+- Comprehensive input validation
+- Role-based middleware
+- Error handling and logging
+- Rate limiting enabled
+
+For detailed setup instructions, check the README files in `/backend` and `/frontend` directories.

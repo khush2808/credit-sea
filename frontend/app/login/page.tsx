@@ -23,6 +23,9 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
 
+    // Debug log - TODO: remove this
+    console.log('Login attempt for:', formData.email)
+
     const success = await login(formData.email, formData.password)
     if (success) {
       router.push('/dashboard')
@@ -41,7 +44,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
-        {}
         <div className="text-center">
           <div className="flex justify-center items-center mb-4">
             <div className="bg-primary p-3 rounded-full">
@@ -52,7 +54,6 @@ export default function LoginPage() {
           <p className="text-gray-600 mt-2">Sign in to your account</p>
         </div>
 
-        {}
         <Card>
           <CardHeader>
             <CardTitle>Welcome Back</CardTitle>
@@ -135,7 +136,6 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        {}
         <Card className="bg-blue-50 border-blue-200">
           <CardContent className="pt-6">
             <h3 className="text-sm font-medium text-blue-900 mb-2">Demo Credentials</h3>
