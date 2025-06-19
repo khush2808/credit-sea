@@ -23,7 +23,7 @@ const applicationSchema = new Schema<IApplication>(
     tenure: {
       type: Number,
       required: [true, "Loan tenure is required"],
-      min: [6, "Minimum tenure is 6 months"],
+      min: [1, "Minimum tenure is 1 month"],
       max: [360, "Maximum tenure is 360 months"],
     },
     empStatus: {

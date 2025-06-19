@@ -8,10 +8,8 @@ import { logger } from "./utils/logger";
 import { globalErrorHandler, notFound } from "./middleware/errorHandler";
 import { generalLimiter } from "./middleware/rateLimiter";
 
-// Load environment variables first
 dotenv.config();
 
-// Import routes
 import authRoutes from "./routes/authRoutes";
 import applicationRoutes from "./routes/applicationRoutes";
 import loanRoutes from "./routes/loanRoutes";
@@ -21,17 +19,14 @@ import adminRoutes from "./routes/adminRoutes";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Trust proxy for rate limiting
 app.set("trust proxy", 1);
 
-// Security middleware
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
   })
 );
 
-// CORS configuration - Fixed for production
 app.use(
   cors({
     origin: ["http://localhost:3000", "https://credit-sea-rho.vercel.app"],
@@ -41,14 +36,11 @@ app.use(
   })
 );
 
-// Rate limiting
 app.use(generalLimiter);
 
-// Body parsing
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// Basic health check
 app.get("/health", (req, res) => {
   res.status(200).json({
     success: true,
@@ -58,7 +50,6 @@ app.get("/health", (req, res) => {
   });
 });
 
-// API info endpoint
 app.get("/api", (req, res) => {
   res.status(200).json({
     success: true,
@@ -68,7 +59,6 @@ app.get("/api", (req, res) => {
   });
 });
 
-// Debug endpoint - remove this later
 if (process.env.NODE_ENV !== "production") {
   app.get("/debug", (req, res) => {
     res.json({
@@ -79,7 +69,6 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-// API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/loans", loanRoutes);
@@ -89,16 +78,13 @@ app.use("/api/admin", adminRoutes);
 // 404 handler
 app.use(notFound);
 
-// Error handler
 app.use(globalErrorHandler);
 
-// Start server function
 const startServer = async () => {
   try {
     // Connect to database
     await connectDB();
 
-    // Start listening
     app.listen(PORT, () => {
       logger.info(
         `Server running on port ${PORT} in ${
