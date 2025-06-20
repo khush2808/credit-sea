@@ -87,8 +87,8 @@ Frontend runs on http://localhost:3000
 
 ## Default Admin
 
-Email: `admin@loanmanagement.com`  
-Password: `SuperAdmin123!`
+Email: `super@loan.com`  
+Password: `Password@1`
 
 ## Development Notes
 
